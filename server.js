@@ -12,8 +12,21 @@ var io = require('socket.io')(http);
 app.use(express.static(__dirname + '/public'));
 
 // listen for events (name of event, callback) 
-io.on('connection', function () {
+io.on('connection', function (socket) {
     console.log('user connected via socket.io!');
+    
+    // Receive a message from front end
+    socket.on('message', function (message) {
+       console.log('Message recv\'d: ' + message.text);
+       
+       // send to everyone except sender
+       socket.broadcast.emit('message', message);
+    });
+    
+    // Send a message to the front end app
+    socket.emit('message', {
+        text: 'Welcome to the chat application'
+    });
 });
 
 
