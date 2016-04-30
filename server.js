@@ -5,9 +5,17 @@ var app = express();
 //      thus anything the express app listens to, the server
 //      should also listen to.
 var http = require('http').Server(app);
+// install module, but call with http server
+var io = require('socket.io')(http);
 
 // expose a folder to public
 app.use(express.static(__dirname + '/public'));
+
+// listen for events (name of event, callback) 
+io.on('connection', function () {
+    console.log('user connected via socket.io!');
+});
+
 
 // start server, provide PORT and callback
 http.listen(PORT, function() {
