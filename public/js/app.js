@@ -8,6 +8,10 @@ socket.on('connect', function () {
 // custom event (message from server)
 socket.on('message', function (message) {
    console.log('New message:\n' + message.text); 
+   
+   // target by class, start with '.'
+   // append adds to end of html 
+   jQuery('.messages').append('<p>'+ message.text +'</p>');
 });
 
 // Handles submitting of new message
@@ -32,6 +36,5 @@ $form.on('submit', function (event) {
     
     // clear input box and keep cursor in it
     $message.val('');
-    
     
 });

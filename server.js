@@ -19,8 +19,8 @@ io.on('connection', function (socket) {
     socket.on('message', function (message) {
        console.log('Message recv\'d: ' + message.text);
        
-       // send to everyone except sender
-       socket.broadcast.emit('message', message);
+       // send to everyone including sender
+       io.emit('message', message);
     });
     
     // Send a message to the front end app
@@ -29,11 +29,10 @@ io.on('connection', function (socket) {
     });
 });
 
-
 // start server, provide PORT and callback
 http.listen(PORT, function() {
     console.log('Server started');
-})
+});
 
 
  
