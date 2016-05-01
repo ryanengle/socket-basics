@@ -22,5 +22,5 @@ console.log(now.format('x'));
 var timeStamp = 1462056020091;
 var timeStampMoment = moment.utc(timeStamp);
 
-
+// Example Sat, 2016-04-30 18:40:20
 console.log('Example ' + timeStampMoment.local().format('ddd, YYYY-MM-DD HH:mm:ss'));
