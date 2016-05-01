@@ -1,4 +1,8 @@
+var name = getQueryVariable('name') || 'Guest';
+var room = getQueryVariable('room');
 var socket = io();
+
+console.log(name + ' wants to join ' + room);
 
 // event name, function to run when the event happens
 socket.on('connect', function () {
@@ -8,13 +12,19 @@ socket.on('connect', function () {
 // custom event (message from server)
 socket.on('message', function (message) {
    
-   console.log('New message:\n' + message.text); 
+   console.log('New message:\n' + message.text);
+   
+   // Extract timestamp
    var momentTimeStamp = moment.utc(message.timeStamp);
+   
    // target by class, start with '.'
-   // append adds to end of html 
-   jQuery('.messages').append('<p><strong> '+ 
-        momentTimeStamp.local().format('YYYY-MM-DD HH:mm:ss: ') + 
-        '</strong> '+ message.text +'</p>');
+   // append adds to end of html    
+   var $message = jQuery('.messages');   
+   $message.append('<p><strong>' + 
+        momentTimeStamp.local().format('YYYY-MM-DD HH:mm:ss (') +
+        message.name + 
+        '):</strong></p>');
+   $message.append('<p>' + message.text + '</p>');
 });
 
 // Handles submitting of new message
@@ -33,7 +43,7 @@ $form.on('submit', function (event) {
     
     // send msg to server
     socket.emit('message', {
-        // find()
+        name: name,        
         text: $message.val()
     });
     

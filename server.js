@@ -15,7 +15,8 @@ app.use(express.static(__dirname + '/public'));
 
 // listen for events (name of event, callback) 
 io.on('connection', function (socket) {
-    console.log(moment().format("YYYY-MM-DD HH:mm:ss.SS") + ': User connected via socket.io!');
+    console.log(moment().format("YYYY-MM-DD HH:mm:ss.SS: ") + 
+        'User connected via socket.io!');
     
     // Receive a message from front end
     socket.on('message', function (message) {
@@ -33,7 +34,8 @@ io.on('connection', function (socket) {
     socket.emit('message', {        
         text: 'Welcome to the chat application',
         // Add JavaScript timestamp to message
-        timeStamp: moment().valueOf()
+        timeStamp: moment().valueOf(),
+        name: 'System'
     });
 });
 
@@ -41,6 +43,4 @@ io.on('connection', function (socket) {
 http.listen(PORT, function() {
     console.log('Server started');
 });
-
-
  
