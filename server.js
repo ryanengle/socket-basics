@@ -20,11 +20,29 @@ var clientInfo = {};
 io.on('connection', function (socket) {
     console.log(moment().format("YYYY-MM-DD HH:mm:ss.SS: ") + 
         'User connected via socket.io!');
-        
+    
+    // Receive event when a user leaves
+    socket.on('disconnect', function () {
+        var userData = clientInfo[socket.id]; 
+        // check to see if user was part of a chat room 
+        if (typeof userData !== 'undefined') {
+            // leave chat room
+            socket.leave(userData.room);
+            // announce to other users
+            io.to(userData.room).emit('message', {
+               name: 'System',
+               text: userData.name + ' has left!',
+               timeStamp: moment().valueOf() 
+            });
+            // delete info
+            delete clientInfo[socket.id];
+        }
+    });    
+    
     // Receive event to join a room
     // req object comes from app.js 
     socket.on('joinRoom', function (req) {
-        // socket.id will be a dynamic value
+        // socket.id will be a dynamic value (use brackets)
         // req contains user name and room name
         clientInfo[socket.id] = req;
         
