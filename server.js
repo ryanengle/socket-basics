@@ -13,11 +13,39 @@ var moment = require('moment');
 // expose a folder to public
 app.use(express.static(__dirname + '/public'));
 
+// key/value pair containing user's name and room name
+var clientInfo = {};
+
 // listen for events (name of event, callback) 
 io.on('connection', function (socket) {
     console.log(moment().format("YYYY-MM-DD HH:mm:ss.SS: ") + 
         'User connected via socket.io!');
-    
+        
+    // Receive event to join a room
+    // req object comes from app.js 
+    socket.on('joinRoom', function (req) {
+        // socket.id will be a dynamic value
+        // req contains user name and room name
+        clientInfo[socket.id] = req;
+        
+        // add socket to a specific room
+        // built in method that tells socket.io library to
+        // add socket to a specific room
+        socket.join(req.room);
+        // now when join is emitted from client, we get added to
+        // room on server
+        
+        // Let everyone in room know who joined
+        // broadcast sends event to everyone but current socket 
+        // .to allows specification of room
+        // emit sends the event containing the message
+        socket.broadcast.to(req.room).emit('message', {
+           name: 'System',
+           text: req.name + ' has joined!', 
+           timestamp: moment.valueOf()
+        });    
+    });
+        
     // Receive a message from front end
     socket.on('message', function (message) {
        
@@ -26,8 +54,9 @@ io.on('connection', function (socket) {
        console.log(moment.utc(message.timeStamp).local().format(
            "YYYY-MM-DD HH:mm:ss.SS") + ': Message recv\'d: ' + message.text);
        
-       // send to everyone including sender
-       io.emit('message', message);
+       // send to everyone including sender 
+       // .to enables specification of room
+       io.to(clientInfo[socket.id].room).emit('message', message);
     });
     
     // Send a message to the front end app

@@ -4,9 +4,19 @@ var socket = io();
 
 console.log(name + ' wants to join ' + room);
 
+// Update h1 tag
+jQuery('.room-title').text(room);
+
+// Event is fired when the client connects to the server
 // event name, function to run when the event happens
 socket.on('connect', function () {
    console.log('Connected to socket.io server!'); 
+   
+   // joinRoom event
+   socket.emit('joinRoom', {
+       name: name,
+       room: room
+   });
 });
 
 // custom event (message from server)
