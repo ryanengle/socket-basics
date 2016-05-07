@@ -33,8 +33,7 @@ socket.on('message', function (message) {
    var $messages = jQuery('.messages');   
    
    // new element
-   var $message = jQuery('<li class="list-group-item"></li>');
-   
+   var $message = jQuery('<li class="list-group-item"></li>');   
    // Add to new element 
    $message.append('<p><strong>' + momentTimeStamp.local().format('YYYY-MM-DD HH:mm:ss (') +
             message.name + '):</strong></p>');
