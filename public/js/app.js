@@ -27,14 +27,21 @@ socket.on('message', function (message) {
    // Extract timestamp
    var momentTimeStamp = moment.utc(message.timeStamp);
    
+   // $ indicates jQuery
    // target by class, start with '.'
    // append adds to end of html    
-   var $message = jQuery('.messages');   
-   $message.append('<p><strong>' + 
-        momentTimeStamp.local().format('YYYY-MM-DD HH:mm:ss (') +
-        message.name + 
-        '):</strong></p>');
+   var $messages = jQuery('.messages');   
+   
+   // new element
+   var $message = jQuery('<li class="list-group-item"></li>');
+   
+   // Add to new element 
+   $message.append('<p><strong>' + momentTimeStamp.local().format('YYYY-MM-DD HH:mm:ss (') +
+            message.name + '):</strong></p>');
    $message.append('<p>' + message.text + '</p>');
+   
+   // append new element to website
+   $messages.append($message);
 });
 
 // Handles submitting of new message
