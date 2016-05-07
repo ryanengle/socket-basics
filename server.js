@@ -16,6 +16,34 @@ app.use(express.static(__dirname + '/public'));
 // key/value pair containing user's name and room name
 var clientInfo = {};
 
+// Sends current users to provided socket
+function sendCurrentUsers (socket) {    
+    // Determine room
+    var info = clientInfo[socket.id];
+    if (typeof info === 'undefined'){
+        return; // stop, don't search for clients in rooms that don't exist
+    }
+    
+    // Search for users in given room
+    var users = [];
+    Object.keys(clientInfo).forEach(function (socketId) {
+        var userInfo = clientInfo[socketId];
+        
+        if (info.room === userInfo.room) {
+            users.push(userInfo.name);
+        } 
+    });
+    
+    // emit message
+    socket.emit('message', {
+       name: 'System', 
+       // join takes every element in an array, converts to string, 
+       // and pushes it together
+       text: 'Current users: ' + users.join(', '),
+       timeStamp: moment().valueOf()
+    });
+}
+
 // listen for events (name of event, callback) 
 io.on('connection', function (socket) {
     console.log(moment().format("YYYY-MM-DD HH:mm:ss.SS: ") + 
@@ -65,16 +93,19 @@ io.on('connection', function (socket) {
     });
         
     // Receive a message from front end
-    socket.on('message', function (message) {
-       
+    socket.on('message', function (message) {       
        // Add JavaScript timestamp to message
        message.timeStamp = moment().valueOf();
        console.log(moment.utc(message.timeStamp).local().format(
            "YYYY-MM-DD HH:mm:ss.SS") + ': Message recv\'d: ' + message.text);
        
-       // send to everyone including sender 
-       // .to enables specification of room
-       io.to(clientInfo[socket.id].room).emit('message', message);
+       if (message.text === '@currentUsers'){
+           sendCurrentUsers(socket);
+       } else {
+           // send to everyone including sender 
+           // .to enables specification of room
+           io.to(clientInfo[socket.id].room).emit('message', message);           
+       }
     });
     
     // Send a message to the front end app
